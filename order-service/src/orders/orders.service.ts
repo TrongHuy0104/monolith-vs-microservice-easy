@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ProductsService } from '../products/products.service';
@@ -21,6 +21,9 @@ export class OrdersService {
     } catch (error: any) {
       if (error.response && error.response.status === 404) {
         throw new NotFoundException('User not found');
+      }
+      if (!error.response || error.response.status >= 500) {
+        throw new InternalServerErrorException('User-service is unreachable');
       }
       throw new BadRequestException('Error communicating with user-service');
     }
